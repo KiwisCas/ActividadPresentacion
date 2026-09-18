@@ -278,22 +278,142 @@ export function slide8(posOut, colOut, time, sp) {
 
 // ─────────────────────────────────────────────
 //  SLIDE 9 — UNA VISIÓN, DOS GENERACIONES
+//  Coreografía de 3 fases:
+//   1. Choque frontal y desvío vertical hacia arriba (sp: 0.0 → 0.35)
+//   2. Segundo intento en la altura con repulsión violenta (sp: 0.35 → 0.65)
+//   3. Cruce armónico y formación de una base plana firme en la zona de choque (sp: 0.65 → 1.0+)
 // ─────────────────────────────────────────────
 export function slide9(posOut, colOut, time, sp) {
-  const converge = smoothstep(0.15, 0.9, sp);
-  const half = Math.floor(N / 2);
+  // Ponderaciones suaves y continuas para cada una de las 3 etapas
+  const w1 = 1.0 - smoothstep(0.28, 0.38, sp);
+  const w2 = smoothstep(0.28, 0.38, sp) * (1.0 - smoothstep(0.62, 0.72, sp));
+  const w3 = smoothstep(0.62, 0.72, sp);
+
+  const streamParticles = 1800; // Por cada lado (3600 en total para las dos líneas de haz)
+
   for (let i = 0; i < N; i++) {
     const r0 = seed_r0[i], r1 = seed_r1[i], r2 = seed_r2[i];
-    const young = i >= half;
-    const progress = (time * (young ? 0.22 : 0.11) + seed_delay[i]) % 1;
-    const startX = young ? 23 : -23;
-    const targetY = young ? 2 : -2;
-    const x = startX + progress * (young ? -46 : 46);
-    const y = lerp((r1 - 0.5) * 15, targetY + (r1 - 0.5) * 5, converge);
-    posOut[i * 3] = x + noise3(r0 * 3, time * 0.2, r1) * 0.7;
-    posOut[i * 3 + 1] = y;
-    posOut[i * 3 + 2] = (r2 - 0.2) * 4 + Math.sin(progress * TAU) * (young ? 2.5 : 0.7);
-    blendColor(colOut, i, young ? PALETTE.PINK : PALETTE.BLUE, PALETTE.WHITE, converge * 0.38);
+    let px = 0, py = 0, pz = 0;
+
+    if (i < streamParticles * 2) {
+      // ── Corrientes de haz (Línea A: Izquierda / Azul, Línea B: Derecha / Rosa)
+      const isYoung = i >= streamParticles;
+      const side = isYoung ? 1 : -1;
+      const idxInStream = isYoung ? i - streamParticles : i;
+      const u = idxInStream / streamParticles;
+      const flow = (u + time * 0.18 + seed_delay[i] * 0.05) % 1;
+
+      // ── Fase 1: Choque y elevación vertical
+      const reach1 = smoothstep(0.0, 0.18, sp);
+      const deflect1 = smoothstep(0.14, 0.34, sp) * smoothstep(0.35, 0.95, flow);
+      const x1 = side * lerp(32, 1.2, flow * reach1) + side * deflect1 * 2.0;
+      const y1 = -2.5 + Math.sin(flow * PI) * 0.8 + deflect1 * 12.0;
+      const z1 = Math.sin(flow * 8 + time * 1.5) * 1.2 + (r1 - 0.5) * 1.4;
+
+      // ── Fase 2: Re-aproximación en lo alto y repulsión elástica
+      const approach2 = smoothstep(0.32, 0.46, sp);
+      const repelling = smoothstep(0.46, 0.60, sp);
+      const springDecay = Math.exp(-Math.max(0, sp - 0.46) * 10);
+      const spring = Math.sin((sp - 0.46) * 35) * springDecay * 4.5;
+      const arcY = 7.0 + Math.sin(flow * PI) * 1.5;
+      const x2 = side * (lerp(28, 0.8, flow * approach2) + repelling * 15.0 + (sp > 0.46 ? spring : 0));
+      const y2 = arcY + (sp > 0.46 ? (r2 - 0.5) * repelling * 2.5 : 0);
+      const z2 = Math.cos(flow * 6 + time) * 1.8 + (r0 - 0.5) * 1.5;
+
+      // ── Fase 3: Descenso, cruce armónico y unión a la base plana
+      const descent3 = smoothstep(0.64, 0.82, sp);
+      const startX3 = side * 28;
+      const endX3 = -side * 15; // Cruza armoniosamente hacia el otro lado
+      const x3 = lerp(startX3, endX3, flow);
+      let y3 = lerp(lerp(4.5, -1.0, flow), -5.2, descent3);
+      const flatT = smoothstep(0.76, 0.96, sp) * smoothstep(0.3, 1.0, flow);
+      const wave3 = Math.sin(time * 2.2 + x3 * 0.35) * 0.15;
+      y3 = lerp(y3, -5.2 + wave3, flatT);
+      const z3 = Math.sin(flow * TAU + time * 0.8) * (2.8 * (1 - flatT) + 4.5 * flatT) + (r2 - 0.5) * 1.2;
+
+      // Combinación ponderada de las tres fases
+      px = w1 * x1 + w2 * x2 + w3 * x3;
+      py = w1 * y1 + w2 * y2 + w3 * y3;
+      pz = w1 * z1 + w2 * z2 + w3 * z3;
+
+      // Coloración dinámica
+      const baseCol = isYoung ? PALETTE.PINK : PALETTE.BLUE;
+      if (w1 > 0.01) {
+        // En Fase 1, chispas brillantes al chocar
+        blendColor(colOut, i, baseCol, PALETTE.WHITE, deflect1 * 0.85 * w1);
+      } else if (w2 > 0.01) {
+        // En Fase 2, fricción y calor al repelerse
+        blendColor(colOut, i, baseCol, PALETTE.RED, repelling * 0.7 * w2);
+      } else {
+        // En Fase 3, unión armónica con violeta y blanco
+        const unionGlow = flatT * 0.85;
+        blendColor(colOut, i, baseCol, PALETTE.VIOLET, unionGlow * 0.7);
+        if (Math.abs(px) < 4.0) {
+          blendColor(colOut, i, colOut, PALETTE.WHITE, 0.6);
+        }
+      }
+
+    } else {
+      // ── Partículas de impacto / base plana (2900 partículas)
+      const j = i - streamParticles * 2;
+      const sideJ = j % 2 === 0 ? -1 : 1;
+
+      // Fase 1: Surtidor de chispas verticales desde el choque en Y = -2.5
+      const burst1 = smoothstep(0.14, 0.34, sp);
+      const sparkH1 = r0 * 13.5 * burst1;
+      const spread1 = (r1 - 0.5) * (2.5 + sparkH1 * 0.3);
+      const x1 = spread1 + Math.sin(time * 4 + j) * 0.4;
+      const y1 = -2.5 + sparkH1;
+      const z1 = (r2 - 0.5) * (2.5 + sparkH1 * 0.2);
+
+      // Fase 2: Onda expansiva de repulsión horizontal desde (0, 7.0, 0)
+      const rep2 = smoothstep(0.46, 0.62, sp);
+      const distX2 = sideJ * (1.2 + r0 * 18.0 * rep2);
+      const x2 = distX2 + Math.sin(time * 6 + j) * 0.5;
+      const y2 = 7.0 + (r1 - 0.5) * 3.5 * rep2;
+      const z2 = (r2 - 0.5) * 6.0 * rep2;
+
+      // Fase 3: La Base Plana Horizontal ("se forma una base plana en donde se chocaron y funcionó")
+      const nx = 58;
+      const nz = 50;
+      const gx = ((j % nx) / (nx - 1) - 0.5) * 32.0; // Plano horizontal X: [-16, +16]
+      const gz = (Math.floor(j / nx) / (nz - 1) - 0.5) * 16.0; // Plano horizontal Z: [-8, +8]
+      const normRad = Math.sqrt((gx / 16) * (gx / 16) + (gz / 8) * (gz / 8));
+      const expand3 = smoothstep(0.70, 0.94, sp);
+      const formed3 = clamp((expand3 - normRad * 0.6) / 0.4, 0, 1);
+
+      const wave3 = Math.sin(time * 2.4 - normRad * 4.2) * 0.14 * (1.0 - normRad * 0.45);
+      const flatY = -5.2 + wave3;
+
+      // Despliegue desde el punto de choque (0, -5.2, 0) hacia la base plana
+      const x3 = gx * formed3 + (r0 - 0.5) * 0.25;
+      const y3 = lerp(0.0, flatY, smoothstep(0.64, 0.84, sp));
+      const z3 = gz * formed3 + (r1 - 0.5) * 0.25;
+
+      px = w1 * x1 + w2 * x2 + w3 * x3;
+      py = w1 * y1 + w2 * y2 + w3 * y3;
+      pz = w1 * z1 + w2 * z2 + w3 * z3;
+
+      // Color de las chispas y de la base plana
+      if (w1 > 0.01) {
+        blendColor(colOut, i, PALETTE.WHITE, PALETTE.BLUE, 0.35);
+      } else if (w2 > 0.01) {
+        blendColor(colOut, i, PALETTE.RED, PALETTE.PINK, 0.5);
+      } else {
+        // En la base plana: Gradiente armónico de izquierda (Azul) a centro (Blanco-Oro/Violeta) a derecha (Rosa)
+        const tGrid = (gx + 16) / 32; // 0 a 1 de izquierda a derecha
+        blendColor(colOut, i, PALETTE.BLUE, PALETTE.PINK, tGrid);
+        const centerProximity = 1 - clamp(normRad, 0, 1);
+        blendColor(colOut, i, colOut, PALETTE.WHITE, centerProximity * 0.85);
+        if (normRad < 0.25) {
+          blendColor(colOut, i, colOut, PALETTE.WHITE, 0.95);
+        }
+      }
+    }
+
+    posOut[i * 3]     = px;
+    posOut[i * 3 + 1] = py;
+    posOut[i * 3 + 2] = pz;
   }
 }
 

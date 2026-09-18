@@ -3,7 +3,7 @@
 //  FOTO 6 + QR Memorias (pp móvil) + QR Redes @centrodeeventosupb
 // ─────────────────────────────────────────────
 
-const ASSET_ROOT = './assets/forum/';
+const ASSET_ROOT = `${import.meta.env.BASE_URL}assets/forum/`;
 
 export function initArchivePanel() {
   const layer = document.createElement('section');

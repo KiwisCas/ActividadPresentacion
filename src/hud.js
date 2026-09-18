@@ -305,9 +305,9 @@ export function initHUD(onPrev, onNext, onLanguageChange) {
     <!-- Barra Superior com os Logos Oficiais ao longo de toda a apresentação -->
     <header class="hud-header">
       <div class="hud-brand">
-        <img class="hud-brand-logo-forum" src="./assets/forum/brand-forum.png" alt="Fórum UPB Centro de Eventos" />
+        <img class="hud-brand-logo-forum" src="${import.meta.env.BASE_URL}assets/forum/brand-forum.png" alt="Fórum UPB Centro de Eventos" />
         <div class="hud-brand-divider"></div>
-        <img class="hud-brand-logo-90" src="./assets/forum/brand-90.png" alt="UPB 90 Anos" />
+        <img class="hud-brand-logo-90" src="${import.meta.env.BASE_URL}assets/forum/brand-90.png" alt="UPB 90 Anos" />
       </div>
 
       <div class="hud-top-controls">

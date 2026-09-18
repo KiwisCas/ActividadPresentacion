@@ -8,7 +8,7 @@
 //  Slide 12: FOTO 5 (Auditorio / Futuro se construye)
 // ─────────────────────────────────────────────
 
-const ROOT = './assets/forum/';
+const ROOT = `${import.meta.env.BASE_URL}assets/forum/`;
 
 // Array de 13 posiciones (índices 0 a 12)
 // null para slides sin fotografía según el guión
