@@ -91,5 +91,29 @@ function _toggleFullscreen() {
   }
 }
 
+// ── Gestos táctiles (Swipe horizontal para celular) ───
+let _touchStartX = 0;
+let _touchStartY = 0;
+const SWIPE_THRESHOLD = 45; // px mínimo para considerar un swipe
+
+window.addEventListener('touchstart', (e) => {
+  _touchStartX = e.touches[0].clientX;
+  _touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - _touchStartX;
+  const dy = e.changedTouches[0].clientY - _touchStartY;
+  // Solo si el movimiento horizontal supera el umbral y es más horizontal que vertical
+  if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+    const t = clock.getElapsedTime();
+    if (dx < 0) {
+      slideManagerAPI.next(t); // swipe izquierda → siguiente
+    } else {
+      slideManagerAPI.prev(t); // swipe derecha → anterior
+    }
+  }
+}, { passive: true });
+
 // ── Loop ──────────────────────────────────────
-startLoop();
+startLoop();

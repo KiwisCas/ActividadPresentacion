@@ -365,7 +365,8 @@ export function initHUD(onPrev, onNext, onLanguageChange) {
       </div>
 
       <div class="hud-keys-hint">
-        <span>Use</span> <kbd>←</kbd> <kbd>→</kbd> <span>ou</span> <kbd>Espaço</kbd> <span>para navegar</span>
+        <span class="hud-kbd-hint">Use <kbd>←</kbd> <kbd>→</kbd> ou <kbd>Espaço</kbd> <span>para navegar</span></span>
+        <span class="hud-swipe-hint">← Desliza para navegar →</span>
       </div>
 
       <div class="hud-progress-track">
