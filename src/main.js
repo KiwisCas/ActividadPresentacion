@@ -30,16 +30,16 @@ setSceneAsset(sceneAssetLayer, 0);
 // Sincronizar HUD cuando cambie el slide
 onSlideChange((idx) => {
   updateHUD(idx);
-  setArchiveVisible(archivePanel, idx === 13);
-  setSceneAsset(sceneAssetLayer, idx < 13 ? idx : -1);
+  setArchiveVisible(archivePanel, idx === 12);
+  setSceneAsset(sceneAssetLayer, idx < 12 ? idx : -1);
 });
 
 // Evento de los dots del HUD
 document.addEventListener('hud:goto', (e) => {
   slideManagerAPI.goTo(e.detail, clock.getElapsedTime());
   updateHUD(e.detail);
-  setArchiveVisible(archivePanel, e.detail === 13);
-  setSceneAsset(sceneAssetLayer, e.detail < 13 ? e.detail : -1);
+  setArchiveVisible(archivePanel, e.detail === 12);
+  setSceneAsset(sceneAssetLayer, e.detail < 12 ? e.detail : -1);
 });
 
 // ── Teclado ───────────────────────────────────
@@ -47,13 +47,23 @@ window.addEventListener('keydown', (e) => {
   const t = clock.getElapsedTime();
   switch (e.key) {
     case 'ArrowRight':
+    case 'PageDown':
     case ' ':
       e.preventDefault();
       slideManagerAPI.next(t);
       break;
     case 'ArrowLeft':
+    case 'PageUp':
       e.preventDefault();
       slideManagerAPI.prev(t);
+      break;
+    case 'Home':
+      e.preventDefault();
+      slideManagerAPI.goTo(0, t);
+      break;
+    case 'End':
+      e.preventDefault();
+      slideManagerAPI.goTo(12, t);
       break;
     case 'f':
     case 'F':

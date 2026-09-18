@@ -1,35 +1,76 @@
 // ─────────────────────────────────────────────
-//  SCENE ASSET LAYER — Imagen como campo escénico
+//  SCENE ASSET LAYER — Fotografías Oficiales TED Talk
+//  Mapeo exacto según el guión (solo fotos correspondientes):
+//  Slide 2: FOTO 1 (Grados)
+//  Slide 4: FOTO 2 (Academia + Industria + Ciudad)
+//  Slide 5: FOTO 3 (Impacto / Fondo Futuro)
+//  Slide 8: FOTO 4 (Nuevas rutas / Mesas de trabajo)
+//  Slide 12: FOTO 5 (Auditorio / Futuro se construye)
 // ─────────────────────────────────────────────
 
 const ROOT = './assets/forum/';
 
-const MOMENT_ASSETS = [
-  ['slide-12-futuro.webp', 'Auditorio Forum UPB preparado para un evento'],
-  ['slide-02-grados.webp', 'Ceremonia de grados en Forum UPB'],
-  ['slide-04-actores.webp', 'Encuentro entre actores en Forum UPB'],
-  ['slide-04-actores.webp', 'Academia, industria y ciudad en conversación'],
-  ['slide-05-impacto.webp', 'Evento con actores institucionales y empresariales'],
-  ['slide-08-rutas.webp', 'Mesas de trabajo y conversaciones en comunidad'],
-  ['slide-08-rutas.webp', 'Comunidad en conversación'],
-  ['slide-08-rutas.webp', 'Rutas nuevas a partir de la experiencia'],
-  ['slide-12-futuro.webp', 'Auditorio abierto al futuro'],
-  ['slide-04-actores.webp', 'Dos generaciones compartiendo visión'],
-  ['slide-05-impacto.webp', 'Colaboración y acción colectiva'],
-  ['slide-08-rutas.webp', 'Jóvenes modificando el presente'],
-  ['slide-12-futuro.webp', 'El futuro se construye'],
+// Array de 13 posiciones (índices 0 a 12)
+// null para slides sin fotografía según el guión
+export const SLIDE_PHOTOS = [
+  null, // Slide 1: Sin foto (Portada TED Talk)
+  {
+    src: 'slide-02-grados.webp',
+    badge: 'FOTO 1 · CEREMONIA DE GRADOS',
+    title: 'Fórum UPB: ¿Solo para hacer grados?',
+    alt: 'Fotografía de una ceremonia de grados en Fórum UPB'
+  }, // Slide 2 (FOTO 1)
+  null, // Slide 3: Sin foto (La Universidad sale al mundo)
+  {
+    src: 'slide-04-actores.webp',
+    badge: 'FOTO 2 · PANEL CIUDAD & PAÍS',
+    title: 'Academia + Industria + Ciudad',
+    alt: 'Panel con líderes de gobierno, universidad y empresa en Fórum UPB'
+  }, // Slide 4 (FOTO 2)
+  {
+    src: 'slide-05-impacto.webp',
+    badge: 'FOTO 3 · EL IMPACTO REAL',
+    title: 'El impacto trasciende el evento',
+    alt: 'Lanzamiento de alianzas e impacto institucional en Fórum UPB'
+  }, // Slide 5 (FOTO 3)
+  null, // Slide 6: Sin foto (Comunidad y transformación)
+  null, // Slide 7: Sin foto (Velocidad de la confianza)
+  {
+    src: 'slide-08-rutas.webp',
+    badge: 'FOTO 4 · NUEVAS GENERACIONES',
+    title: 'Nuevas rutas y sinergia colaborativa',
+    alt: 'Mesas de trabajo multigeneracionales con laptops y diálogo activo'
+  }, // Slide 8 (FOTO 4)
+  null, // Slide 9: Sin foto (Una visión, dos generaciones)
+  null, // Slide 10: Sin foto (Crecimiento en conjunto)
+  null, // Slide 11: Sin foto (Los jóvenes son el presente)
+  {
+    src: 'slide-12-futuro.webp',
+    badge: 'FOTO 5 · CONSTRUCCIÓN DE FUTURO',
+    title: 'El auditorio preparado para el mañana',
+    alt: 'Auditorio Fórum UPB iluminado y dispuesto para el futuro'
+  }, // Slide 12 (FOTO 5)
+  null, // Slide 13: Manejado especialmente con FOTO 6 + QRs en archivePanel
 ];
 
 export function initSceneAssetLayer() {
   const layer = document.createElement('aside');
   layer.id = 'scene-asset-layer';
   layer.innerHTML = `
-    <div class="scene-asset-wash"></div>
-    <img class="scene-asset-image" alt="" />
-    <div class="scene-asset-edge"></div>
-    <div class="scene-asset-brands">
-      <img src="${ROOT}brand-forum.png" alt="Fórum UPB" />
-      <img src="${ROOT}brand-90.png" alt="90 años UPB" />
+    <div class="scene-photo-container">
+      <div class="scene-photo-glow"></div>
+      <div class="scene-photo-card">
+        <div class="scene-photo-frame">
+          <img class="scene-photo-img" alt="" />
+          <div class="scene-photo-badge">
+            <span class="scene-photo-dot"></span>
+            <span class="scene-photo-badge-text"></span>
+          </div>
+        </div>
+        <div class="scene-photo-caption">
+          <span class="scene-photo-title"></span>
+        </div>
+      </div>
     </div>
   `;
   document.body.appendChild(layer);
@@ -37,15 +78,27 @@ export function initSceneAssetLayer() {
 }
 
 export function setSceneAsset(layer, index) {
-  const asset = MOMENT_ASSETS[index];
-  const visible = Boolean(asset);
-  layer.classList.remove('is-changing');
-  layer.classList.toggle('is-visible', visible);
-  layer.dataset.moment = String(index + 1);
-  if (!visible) return;
+  const photo = SLIDE_PHOTOS[index];
+  const isVisible = Boolean(photo);
 
-  const image = layer.querySelector('.scene-asset-image');
-  image.src = `${ROOT}${asset[0]}`;
-  image.alt = asset[1];
-  requestAnimationFrame(() => layer.classList.add('is-changing'));
+  layer.classList.remove('is-active');
+  layer.classList.toggle('is-visible', isVisible);
+  layer.dataset.slide = String(index + 1);
+
+  if (!isVisible) {
+    return;
+  }
+
+  const img = layer.querySelector('.scene-photo-img');
+  const badgeText = layer.querySelector('.scene-photo-badge-text');
+  const title = layer.querySelector('.scene-photo-title');
+
+  img.src = `${ROOT}${photo.src}`;
+  img.alt = photo.alt;
+  badgeText.textContent = photo.badge;
+  title.textContent = photo.title;
+
+  requestAnimationFrame(() => {
+    layer.classList.add('is-active');
+  });
 }

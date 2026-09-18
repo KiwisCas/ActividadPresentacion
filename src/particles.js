@@ -88,6 +88,7 @@ export function initParticles(scene) {
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    opacity: 0.88,
   });
 
   particleSystem = new THREE.Points(geometry, particleMaterial);

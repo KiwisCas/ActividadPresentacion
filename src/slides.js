@@ -412,17 +412,10 @@ export function slide13(posOut, colOut, time, sp, closingPositions, closingColor
   }
 }
 
-// ─────────────────────────────────────────────
-//  SLIDE 14 — MEMORIA VISUAL Y CONTINUIDAD
-// ─────────────────────────────────────────────
-export function slide14(posOut, colOut, time, sp, closingPositions, closingColors) {
-  slide13(posOut, colOut, time * 0.72, sp, closingPositions, closingColors);
-}
-
 // ── Registro ──────────────────────────────────
 export const SLIDES = [
   slide1, slide2, slide3, slide4,
   slide5, slide6, slide7, slide8,
   slide9, slide10, slide11, slide12,
-  slide13, slide14,
+  slide13,
 ];
