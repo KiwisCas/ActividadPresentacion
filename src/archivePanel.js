@@ -40,3 +40,11 @@ export function initArchivePanel() {
 export function setArchiveVisible(layer, visible) {
   layer.classList.toggle('is-visible', visible);
 }
+
+export function setArchiveLanguage(layer, language) {
+  const labels = language === 'pt'
+    ? ['O que acontece aqui continua lá fora.', 'Anais', '@centrodeeventosupb']
+    : ['Lo que ocurre aquí continúa afuera.', 'Memorias', '@centrodeeventosupb'];
+  layer.querySelector('.archive-feature figcaption').textContent = labels[0];
+  layer.querySelector('.archive-exits a:first-child span').textContent = labels[1];
+}

@@ -7,20 +7,23 @@ import { initRenderer, startLoop, clock } from './renderer.js';
 import { slideManagerAPI, onSlideChange } from './slideManager.js';
 import { initHUD, updateHUD } from './hud.js';
 import { loadClosingForm } from './logoMapper.js';
-import { initArchivePanel, setArchiveVisible } from './archivePanel.js';
+import { initArchivePanel, setArchiveVisible, setArchiveLanguage } from './archivePanel.js';
 import { initSceneAssetLayer, setSceneAsset } from './sceneAssetLayer.js';
 
 // ── Inicialización ────────────────────────────
 const container = document.getElementById('canvas-container');
 initRenderer(container);
 
+const archivePanel = initArchivePanel();
+setArchiveVisible(archivePanel, false);
+setArchiveLanguage(archivePanel, 'es');
+
 // ── HUD ───────────────────────────────────────
 initHUD(
   () => slideManagerAPI.prev(clock.getElapsedTime()),
   () => slideManagerAPI.next(clock.getElapsedTime()),
+  (language) => setArchiveLanguage(archivePanel, language),
 );
-const archivePanel = initArchivePanel();
-setArchiveVisible(archivePanel, false);
 const sceneAssetLayer = initSceneAssetLayer();
 setSceneAsset(sceneAssetLayer, 0);
 
