@@ -14,11 +14,6 @@ export function initArchivePanel() {
     <div class="archive-inner">
       <!-- Encabezado de Marcas -->
       <div class="archive-header">
-        <div class="archive-brand-group">
-          <img class="archive-brand-main" src="${ASSET_ROOT}brand-forum.png" alt="Fórum UPB Centro de Eventos" />
-          <div class="archive-brand-divider"></div>
-          <img class="archive-brand-sub" src="${ASSET_ROOT}brand-90.png" alt="90 años UPB" />
-        </div>
         <div class="archive-tag">
           <span class="archive-tag-dot"></span>
           <span>TED TALK · CONCLUSIONES & CONTACTO</span>
@@ -31,10 +26,6 @@ export function initArchivePanel() {
         <div class="archive-photo-card">
           <div class="archive-photo-wrapper">
             <img class="archive-photo-img" src="${ASSET_ROOT}slide-13-cierre.webp" alt="Campus y Fórum UPB al atardecer" />
-            <div class="archive-photo-overlay">
-              <span class="archive-badge">FOTO 6 · CAMPUS FÓRUM UPB</span>
-              <p class="archive-photo-quote">"Lo que ocurre aquí continúa afuera."</p>
-            </div>
           </div>
         </div>
 

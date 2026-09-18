@@ -62,13 +62,6 @@ export function initSceneAssetLayer() {
       <div class="scene-photo-card">
         <div class="scene-photo-frame">
           <img class="scene-photo-img" alt="" />
-          <div class="scene-photo-badge">
-            <span class="scene-photo-dot"></span>
-            <span class="scene-photo-badge-text"></span>
-          </div>
-        </div>
-        <div class="scene-photo-caption">
-          <span class="scene-photo-title"></span>
         </div>
       </div>
     </div>
@@ -90,13 +83,9 @@ export function setSceneAsset(layer, index) {
   }
 
   const img = layer.querySelector('.scene-photo-img');
-  const badgeText = layer.querySelector('.scene-photo-badge-text');
-  const title = layer.querySelector('.scene-photo-title');
 
   img.src = `${ROOT}${photo.src}`;
   img.alt = photo.alt;
-  badgeText.textContent = photo.badge;
-  title.textContent = photo.title;
 
   requestAnimationFrame(() => {
     layer.classList.add('is-active');
